@@ -1,0 +1,32 @@
+Helm es un administrador de paquetes para kubernetes.
+
+Chart: recurso/paquete
+
+Diferencias entre Helm y Kustomize:
+
+    Helm se centra en el manejo de paquetes y la instalación de aplicaciones, 
+    mientras que Kustomize se centra en la personalización de recursos.
+
+Comando para ver los valores utilizables en helm:
+
+    helm show values repo/chart
+
+Usar un chart seteamdo valores 
+
+    helm install <name> <repo>/<chart> --set clave=valor
+
+Actualizar un chart instalado y ejecutado
+
+    helm upgrade <name> <repo>/<chart> --set clave=valor
+
+Arrancar un chart mediante un yaml de valores
+
+    helm install <name> <repo>/<chart> --values=values.yaml
+
+Obtener el yaml de un template con los valores desde el terminal
+
+    helm tamplate <name> <ruta de la carpeta> --values=<values.yaml> > nombre.yaml
+
+Generar el kustomize con helm:
+
+    kustomize build . --enable-helm

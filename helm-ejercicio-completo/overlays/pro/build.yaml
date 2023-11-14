@@ -1,0 +1,363 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pro
+spec: {}
+---
+apiVersion: v1
+data:
+  page: |-
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Prueba nginx with chart</title>
+    </head>
+    <body>
+        <h2>Esto es una prueba de nginx desde un chart con un volumen desde prod con https</h2>
+    </body>
+    </html>
+kind: ConfigMap
+metadata:
+  name: nginx-https-page-cm-pro-62t626gh4t
+  namespace: pro
+---
+apiVersion: v1
+data:
+  page: |-
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Prueba nginx with chart</title>
+    </head>
+    <body>
+        <h2>Esto es una prueba de nginx desde un chart con un volumen desde prod</h2>
+    </body>
+    </html>
+kind: ConfigMap
+metadata:
+  name: nginx-page-cm-pro-kcbck99mc5
+  namespace: pro
+---
+apiVersion: v1
+data:
+  server-block.conf: |-
+    server {
+      listen 4433 ssl;
+      server_name localhost;
+
+      ssl_certificate /etc/nginx/ssl/nginx-selfsigned.crt;
+      ssl_certificate_key /etc/nginx/ssl/nginx-selfsigned.key;
+
+      location / {
+          root /usr/share/nginx/html/pro;
+          index index.html;
+      }
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    app: nginx
+    app.kubernetes.io/instance: nginx
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/version: 1.25.3
+    helm.sh/chart: nginx-15.4.2
+  name: nginx-server-block-pro
+  namespace: pro
+---
+apiVersion: v1
+data:
+  server: |-
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+    }
+kind: ConfigMap
+metadata:
+  name: nginx-server-cm-pro-6h45dhk9mh
+  namespace: pro
+---
+apiVersion: v1
+data:
+  tls.crt: |
+    LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVOVENDQXgyZ0F3SUJBZ0lVWnJPSj
+    dIK3Y1MVpKdW5sRS9ZcHBlam9uOVUwd0RRWUpLb1pJaHZjTkFRRUwKQlFBd2dha3hDekFK
+    QmdOVkJBWVRBa05QTVJzd0dRWURWUVFJREJKT2IzSjBaU0JrWlNCellXNTBZVzVrWlhJeA
+    pFakFRQmdOVkJBY01DVVBEZzhLNlkzVjBZVEVXTUJRR0ExVUVDZ3dOUldSMVlYSWdZMjl0
+    Y0dGdWVURVRNQkVHCkExVUVDd3dLUkdWMlpXeHZjR1Z5Y3pFU01CQUdBMVVFQXd3SmJHOW
+    pZV3hvYjNOME1TZ3dKZ1lKS29aSWh2Y04KQVFrQkZobDRZWFpwWlhKaGRtVnVaR0Z1Ynps
+    QVoyMWhhV3d1WTI5dE1CNFhEVEl6TVRBeE9ERTVORE0xTWxvWApEVEkwTVRBeE56RTVORE
+    0xTWxvd2dha3hDekFKQmdOVkJBWVRBa05QTVJzd0dRWURWUVFJREJKT2IzSjBaU0JrClpT
+    QnpZVzUwWVc1a1pYSXhFakFRQmdOVkJBY01DVVBEZzhLNlkzVjBZVEVXTUJRR0ExVUVDZ3
+    dOUldSMVlYSWcKWTI5dGNHRnVlVEVUTUJFR0ExVUVDd3dLUkdWMlpXeHZjR1Z5Y3pFU01C
+    QUdBMVVFQXd3SmJHOWpZV3hvYjNOMApNU2d3SmdZSktvWklodmNOQVFrQkZobDRZWFpwWl
+    hKaGRtVnVaR0Z1YnpsQVoyMWhhV3d1WTI5dE1JSUJJakFOCkJna3Foa2lHOXcwQkFRRUZB
+    QU9DQVE4QU1JSUJDZ0tDQVFFQWtmZzVlNzdiUGE2ZGt2Skd5S1p5U2hSWjNSWmIKT3F6SE
+    NkamNza04vVmZWd2YvU0Y0K1orUzdKOGpsQWNlSXp5b1UxWG9VL0NYdnlHZThzREdaSUZR
+    aEJ5OVhXbgpxekp4NElHQVY4TnF2aUo0cGpNempQMjZHekprei82dm5ZNitzNUZGT0NseE
+    ZBdzg0d0dUbmU1dWtLS3kxRGJDClQ5V1BjZ1hUZ3NnUXlZcHJNaU0xbzF4SlZrUkpvY3lE
+    R2thSS9nY3RHSUZPd2lNMHhocFk4QWtIdXkxNEhFaHQKOFlCK3NMMkVnRHlBOG1jMTNPeT
+    MvT0N2NjZuK29kMnJ1V3hOY1dneGNtK3UzNG9pQ2pVRXlBcE1nUnY0UnpiVQorOVlWWGRT
+    NTdkdURjWU5ZSFFxZ0EzUWFSVVJ3Z2Y4REdGeGpHeUMzUWZMQVJ0WDFzaWhOOGZYKzVRSU
+    RBUUFCCm8xTXdVVEFkQmdOVkhRNEVGZ1FVVXBRZzl4U0hnVzZDQnYwR0hyemRKV3QyZi84
+    d0h3WURWUjBqQkJnd0ZvQVUKVXBRZzl4U0hnVzZDQnYwR0hyemRKV3QyZi84d0R3WURWUj
+    BUQVFIL0JBVXdBd0VCL3pBTkJna3Foa2lHOXcwQgpBUXNGQUFPQ0FRRUFPUGdWNjlHVWF5
+    TUhVY0pYZkdGbi9NRWljL1J0YWVsMXJHKzdiR3FrYzh4Vk5oaFZoS0xDCmNtV29RMzhXd1
+    RiUUp2aVNBRTQ5ZElqKy9BbXhDMUZpQW1iWXYvekhDb1F6NHZ3cDhvZkhZWU9HdnNkVUpU
+    UVkKblo4dDk4MW9FeGw5QVExK01EaWpPckRoZW1VeTJtNmxCREZyd25qU3Z3MnVBeUIvbk
+    FPWFlJeVZiRkNhV0IrSApydGlUemd6TlJaTXY2aEkvZ3pUaFhYMVFPT1pzV05JajVpWXV1
+    VVVEZkxhOFVNZUdIR2ZhRjNBdHk2UFAwaEI1CmxYTnBOeUJ0aVFuc0xsOG5GWCtwTW4zS1
+    YveTVOT0lwU2xUVWU1V3hEWFdFclprUnNIK0dhalY3OEZYcmxsK24KKzgzWFBmMXpDN1cw
+    dXp2aitPRXg2a1RaelBkRU1uVlg2Zz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+  tls.key: |
+    LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2UUlCQURBTkJna3Foa2lHOXcwQk
+    FRRUZBQVNDQktjd2dnU2pBZ0VBQW9JQkFRQ1IrRGw3dnRzOXJwMlMKOGtiSXBuSktGRm5k
+    RmxzNnJNY0oyTnl5UTM5VjlYQi85SVhqNW41THNueU9VQng0alBLaFRWZWhUOEplL0laNw
+    p5d01aa2dWQ0VITDFkYWVyTW5IZ2dZQlh3MnErSW5pbU16T00vYm9iTW1UUC9xK2RqcjZ6
+    a1VVNEtYRVVERHpqCkFaT2Q3bTZRb3JMVU5zSlAxWTl5QmRPQ3lCREppbXN5SXpXalhFbF
+    dSRW1oeklNYVJvaitCeTBZZ1U3Q0l6VEcKR2xqd0NRZTdMWGdjU0czeGdINnd2WVNBUElE
+    eVp6WGM3TGY4NEsvcnFmNmgzYXU1YkUxeGFERnliNjdmaWlJSwpOUVRJQ2t5QkcvaEhOdF
+    Q3MWhWZDFMbnQyNE54ZzFnZENxQURkQnBGUkhDQi93TVlYR01iSUxkQjhzQkcxZld5CktF
+    M3g5ZjdsQWdNQkFBRUNnZ0VBQU9qcnJzNUhQcEN1a2NKcDE0bFdFQWtsY0QvWjdMa3orbW
+    M4Sk81UHhtRGoKeFNCb2p6MmFEdTI3WWdXMHo3bU5MNTAwVFNDYXBRM3M1cXVpeHMrR3Nk
+    MDVZamRNQnNDblBnK0FsY3QxaUY3ZApvcWVTRERCdXJ3bTI0Q2NGd0RVcUVpTjNLM3p5by
+    8zWmlVNnl0VnJObktBdS9peWpORzB2MmpXWUZtb1oxSy9DClJ6UjZFTml5ZHdUZ3MxSXhs
+    WXZKZG43TFhjYlJJKytrOEdGM1A4UGlNUGFJRlZ3L0ZpN3ZrdnhMNG5FOW11VloKZEM5bj
+    ZTbDZtQUMrU1BxZ1Y1bERPUzZXRm1FTUpOeWw0Wm9rTWxWZ0V5ZnE5WmtrMVBsdVpQNWIw
+    cU91L0dFLwpSS2tia3laU0MvY2Vna1pQZ3dtNkJyWHJnZ1h0QzdxUy8xdFpma0ZNSVFLQm
+    dRQzg3QmRySlMrR2Z6TWdWZm5jClB6dEhVY2NHdlUyaU5OOGJCVU9YTlpIZnJzemN4WnNI
+    Z3VDWXZWcVdtcXVqQm5wRFpIbFYrT0E1cUNxdFB3SzQKTGFTdTVRWWhmTm0rZTNETnJMTF
+    BZZ1BHd2MzeDJjSmlSS3FGS1Z1Wm5BS2dXY1FvU3dnZFNNRnBzWTlaVHBTMApRdUdlOEdv
+    UExsa1RjVEY0OXNQVjZURkUwUUtCZ1FERnkvOFdicWdGd253dndIUEV5VU9uQk1QWENVNE
+    w5bDdRCkdqTnNxd2RTSWR1NGpBMVEyd2JUZzBxUjhDUWJrSFZZU09ram5qd21YM3loZGxh
+    Rkc5bm5sM2drQ08ycEFZYlkKd0lLbDUyUDBwbzR3RjRqYjdKWXVmVkt6UnpDTFVVRnhyZz
+    JrdU9JeHp0TXdCWGVhSVhqWWtzYlFPRTE5YkVqWgpoamhodUs4dDFRS0JnQ1NFamxKTHNk
+    QVJybFJGeWpKa2xwVEduZTRUa1hvVk5qc0czWFhSQ1ExdndIRzhVS2MzCkNTcjlEeEdsZk
+    IvYkZLOEtNTm9KYlc0M3IyZ2xrZVVBRGFFdzYrcDFNN0c2TXFmUEJoRklKT3E2YzVDWVF4
+    YXoKcHpKdU9DS05JWVRWVlRGa3I0RFptMmxPeFNMQ0tjUmVXVFpieW1SODFRTUpFa01Mai
+    9jOVNDVEJBb0dCQUorVQo3WEtneHFrVzkzRGpXY1BjQ2R3WHFSVzJLU1RYbWpsVjJrV0RX
+    ejIxbVhzMGE0M2ZtSXRQOHZyNWYzaEp2Wk1FCkNDMDNmaG9Ma2hjR3pkbEkxaTdXY3hUSH
+    EwOWVydmZ6b2JUT2trT1JtVWhOeEpxREw4dkVTdFBmek5lcU1CM1MKcXFsS2pSeFlYT1R5
+    bEVOalhBZUhyQ1hVTnhqSkk2RjBlOHJENFhvZEFvR0FMLzJNUE9aZ3F6aTMxZlUrRy9Uaw
+    p5ajVOMllPRXFnWUVMNFc0ditQdndUdmpSL0dhMUZNWGFFSHNmcm1SVWMrK2R4M0RzVWtB
+    ekVTLyt5N1Q1cHJwCjFkenVOKzJEMjRNZkdTMEd3Z0d1TVhrWHljcjdoZEhycjNNT01RTj
+    VMYlNtcEpKK1Uwc1VKUjRWZUhXSFE2SHkKVFVNYzZWbS8xc3hIOVpEVXlmVnZWb2M9Ci0t
+    LS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K
+kind: Secret
+metadata:
+  name: nginx-ssl-secret-pro-2kgfhfgb85
+  namespace: pro
+type: kubernetes.io/tls
+---
+apiVersion: v1
+data:
+  user: RURVQVI=
+kind: Secret
+metadata:
+  name: nginx-user-secret-pro-ccck7bhmkk
+  namespace: pro
+type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nginx
+    app.kubernetes.io/instance: nginx
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/version: 1.25.3
+    helm.sh/chart: nginx-15.4.2
+  name: nginx-pro
+  namespace: pro
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  - name: https
+    port: 443
+    targetPort: https
+  selector:
+    app.kubernetes.io/instance: nginx
+    app.kubernetes.io/name: nginx
+  sessionAffinity: None
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx
+    app.kubernetes.io/instance: nginx
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/version: 1.25.3
+    helm.sh/chart: nginx-15.4.2
+  name: nginx-pro
+  namespace: pro
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: nginx
+      app.kubernetes.io/name: nginx
+  strategy:
+    rollingUpdate: {}
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/server-block-configuration: 31c31f2bc889229df15505b748aacd6e735a22be16a3006d43b08ad2c75de8a3
+      labels:
+        app: nginx
+        app.kubernetes.io/instance: nginx
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: nginx
+        app.kubernetes.io/version: 1.25.3
+        helm.sh/chart: nginx-15.4.2
+    spec:
+      affinity:
+        nodeAffinity: null
+        podAffinity: null
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: nginx
+                  app.kubernetes.io/name: nginx
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      automountServiceAccountToken: false
+      containers:
+      - env:
+        - name: BITNAMI_DEBUG
+          value: "false"
+        - name: NGINX_HTTP_PORT_NUMBER
+          value: "8080"
+        - name: NGINX_HTTPS_PORT_NUMBER
+          value: "4433"
+        - name: USER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: nginx-user-secret-pro-ccck7bhmkk
+        envFrom: null
+        image: docker.io/bitnami/nginx:1.25.3-debian-11-r1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 6
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: http
+          timeoutSeconds: 5
+        name: nginx
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 4433
+          name: https
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: http
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          privileged: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /opt/bitnami/nginx/conf/server_blocks
+          name: nginx-server-block
+        - mountPath: /usr/share/nginx/html
+          name: nginx-page-volume
+        - mountPath: /usr/share/nginx/html/pro
+          name: nginx-https-page-volume
+        - mountPath: /etc/nginx/ssl/
+          name: nginx-ssl-volume
+        - mountPath: /opt/bitnami/nginx/conf/bitnami/
+          name: nginx-server-volume
+      hostIPC: false
+      hostNetwork: false
+      initContainers: null
+      securityContext:
+        fsGroup: 1001
+        sysctls: []
+      serviceAccountName: default
+      shareProcessNamespace: false
+      volumes:
+      - configMap:
+          name: nginx-server-block-pro
+        name: nginx-server-block
+      - configMap:
+          items:
+          - key: page
+            path: index.html
+          name: nginx-page-cm-pro-kcbck99mc5
+        name: nginx-page-volume
+      - configMap:
+          items:
+          - key: page
+            path: index.html
+          name: nginx-https-page-cm-pro-62t626gh4t
+        name: nginx-https-page-volume
+      - name: nginx-ssl-volume
+        secret:
+          items:
+          - key: tls.crt
+            path: nginx-selfsigned.crt
+          - key: tls.key
+            path: nginx-selfsigned.key
+          secretName: nginx-ssl-secret-pro-2kgfhfgb85
+      - configMap:
+          items:
+          - key: server
+            path: server.conf
+          name: nginx-server-cm-pro-6h45dhk9mh
+        name: nginx-server-volume
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app: nginx
+    app.kubernetes.io/instance: nginx
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/version: 1.25.3
+    helm.sh/chart: nginx-15.4.2
+  name: nginx-pro
+  namespace: pro
+spec:
+  maxReplicas: 10
+  metrics: null
+  minReplicas: 3
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-pro

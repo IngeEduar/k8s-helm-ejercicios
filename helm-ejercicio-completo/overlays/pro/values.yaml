@@ -1,0 +1,88 @@
+commonLabels:
+  app: nginx
+
+replicaCount: 3
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+
+service:
+  type: LoadBalancer
+  ports:
+    http: 80
+    https: 443
+  targetPort:
+    http: http
+    https: https
+  
+extraVolumeMounts:
+  - name: nginx-page-volume
+    mountPath: /usr/share/nginx/html
+  - name: nginx-https-page-volume
+    mountPath: /usr/share/nginx/html/pro
+  - name: nginx-ssl-volume
+    mountPath: /etc/nginx/ssl/
+  - name: nginx-server-volume
+    mountPath: /opt/bitnami/nginx/conf/bitnami/
+
+containerPorts:
+  https: 4433
+
+extraVolumes:
+  - name: nginx-page-volume
+    configMap:
+      name: nginx-page-cm
+      items:
+      - key: page
+        path: index.html
+  - name: nginx-https-page-volume
+    configMap:
+      name: nginx-https-page-cm
+      items:
+      - key: page
+        path: index.html
+  - name: nginx-ssl-volume
+    secret:
+      secretName: nginx-ssl-secret
+      items:
+        - key: tls.crt
+          path: nginx-selfsigned.crt
+        - key: tls.key
+          path: nginx-selfsigned.key
+  - name: nginx-server-volume
+    configMap:
+      name: nginx-server-cm
+      items:
+      - key: server
+        path: server.conf
+
+extraEnvVars:
+- name: USER
+  valueFrom:
+    secretKeyRef:
+        name: nginx-user-secret
+        key: user
+
+serverBlock: |-
+  server {
+    listen 4433 ssl;
+    server_name localhost;
+
+    ssl_certificate /etc/nginx/ssl/nginx-selfsigned.crt;
+    ssl_certificate_key /etc/nginx/ssl/nginx-selfsigned.key;
+
+    location / {
+        root /usr/share/nginx/html/pro;
+        index index.html;
+    }
+  }

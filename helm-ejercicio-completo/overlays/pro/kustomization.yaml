@@ -1,0 +1,37 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+nameSuffix: -pro
+namespace: pro
+
+resources:
+- ../../bases
+- namespace.yaml
+
+configMapGenerator:
+- name: nginx-page-cm
+  files:
+    - page=nginx/pages/index.html
+- name: nginx-https-page-cm
+  files:
+    - page=nginx/pages/pro.html
+- name: nginx-server-cm
+  files:
+    - server=nginx/servers/server.conf
+
+secretGenerator:
+- name: nginx-user-secret
+  files:
+    - user=secrets/user.txt
+- name: nginx-ssl-secret
+  files:
+    - tls.crt=secrets/nginx-ssl/nginx-selfsigned.crt
+    - tls.key=secrets/nginx-ssl/nginx-selfsigned.key
+  type: "kubernetes.io/tls"
+
+helmChartInflationGenerator:
+- chartName: nginx
+  chartRepoUrl: https://charts.bitnami.com/bitnami
+  chartVersion: 15.4.2
+  releaseName: nginx
+  values: values.yaml

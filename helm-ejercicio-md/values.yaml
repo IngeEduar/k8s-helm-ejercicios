@@ -1,0 +1,50 @@
+commonLabels:
+  app: nginx
+
+replicaCount: 3
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+
+service:
+  type: LoadBalancer
+  ports:
+    http: 80
+    https: 443
+  
+extraVolumeMounts:
+  - name: nginx-page-volume
+    mountPath: /usr/share/nginx/html
+  - name: nginx-server-volume
+    mountPath: /opt/bitnami/nginx/conf/bitnami/
+
+extraVolumes:
+  - name: nginx-page-volume
+    configMap:
+      name: nginx-page-cm
+      items:
+      - key: page
+        path: index.html
+  - name: nginx-server-volume
+    configMap:
+      name: nginx-server-cm
+      items:
+      - key: server
+        path: server.conf
+
+extraEnvVars:
+- name: USER
+  valueFrom:
+    secretKeyRef:
+        name: nginx-user-secret
+        key: user

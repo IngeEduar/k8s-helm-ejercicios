@@ -1,0 +1,29 @@
+commonLabels:
+  app: nginx
+
+replicaCount: 3
+
+podLabels:
+  name: pod-nginx
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+
+service:
+  type: LoadBalancer
+  ports:
+    http: 80
+    https: 443
+#  nodePorts:
+#    http: ""
+#    https: ""

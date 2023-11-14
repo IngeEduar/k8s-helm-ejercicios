@@ -1,0 +1,35 @@
+commonLabels:
+  app: nginx
+
+replicaCount: 3
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+
+service:
+  type: LoadBalancer
+  ports:
+    http: 80
+    https: 443
+  
+extraVolumeMounts:
+  - name: nginx-page-volume
+    mountPath: /app
+
+extraVolumes:
+  - name: nginx-page-volume
+    configMap:
+      name: nginx-page-cm
+      items:
+      - key: page
+        path: index.html

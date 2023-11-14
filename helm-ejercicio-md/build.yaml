@@ -1,0 +1,205 @@
+apiVersion: v1
+data:
+  page: |-
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Prueba nginx with chart</title>
+    </head>
+    <body>
+        <h2>Esto es una prueba de nginx desde un chart con un volumen</h2>
+    </body>
+    </html>
+kind: ConfigMap
+metadata:
+  name: nginx-page-cm-khhkd8fh9t
+---
+apiVersion: v1
+data:
+  server: |-
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+    }
+kind: ConfigMap
+metadata:
+  name: nginx-server-cm-6h45dhk9mh
+---
+apiVersion: v1
+data:
+  user: RURVQVI=
+kind: Secret
+metadata:
+  name: nginx-user-secret-ccck7bhmkk
+type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nginx
+    app.kubernetes.io/instance: nginx
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/version: 1.25.3
+    helm.sh/chart: nginx-15.4.2
+  name: nginx
+  namespace: default
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  selector:
+    app.kubernetes.io/instance: nginx
+    app.kubernetes.io/name: nginx
+  sessionAffinity: None
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx
+    app.kubernetes.io/instance: nginx
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/version: 1.25.3
+    helm.sh/chart: nginx-15.4.2
+  name: nginx
+  namespace: default
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: nginx
+      app.kubernetes.io/name: nginx
+  strategy:
+    rollingUpdate: {}
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations: null
+      labels:
+        app: nginx
+        app.kubernetes.io/instance: nginx
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: nginx
+        app.kubernetes.io/version: 1.25.3
+        helm.sh/chart: nginx-15.4.2
+    spec:
+      affinity:
+        nodeAffinity: null
+        podAffinity: null
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: nginx
+                  app.kubernetes.io/name: nginx
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      automountServiceAccountToken: false
+      containers:
+      - env:
+        - name: BITNAMI_DEBUG
+          value: "false"
+        - name: NGINX_HTTP_PORT_NUMBER
+          value: "8080"
+        - name: USER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: nginx-user-secret-ccck7bhmkk
+        envFrom: null
+        image: docker.io/bitnami/nginx:1.25.3-debian-11-r1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 6
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: http
+          timeoutSeconds: 5
+        name: nginx
+        ports:
+        - containerPort: 8080
+          name: http
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: http
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          privileged: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /usr/share/nginx/html
+          name: nginx-page-volume
+        - mountPath: /opt/bitnami/nginx/conf/bitnami/
+          name: nginx-server-volume
+      hostIPC: false
+      hostNetwork: false
+      initContainers: null
+      securityContext:
+        fsGroup: 1001
+        sysctls: []
+      serviceAccountName: default
+      shareProcessNamespace: false
+      volumes:
+      - configMap:
+          items:
+          - key: page
+            path: index.html
+          name: nginx-page-cm-khhkd8fh9t
+        name: nginx-page-volume
+      - configMap:
+          items:
+          - key: server
+            path: server.conf
+          name: nginx-server-cm-6h45dhk9mh
+        name: nginx-server-volume
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app: nginx
+    app.kubernetes.io/instance: nginx
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/version: 1.25.3
+    helm.sh/chart: nginx-15.4.2
+  name: nginx
+  namespace: default
+spec:
+  maxReplicas: 10
+  metrics: null
+  minReplicas: 3
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx
