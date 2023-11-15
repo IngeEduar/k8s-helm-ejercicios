@@ -1,0 +1,49 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: dev
+namePrefix: app-
+nameSuffix: -dev
+
+resources:
+  - ../../bases/backend
+  - ../../bases/frontend
+  - namespace.yaml
+
+configMapGenerator:
+- name: front-nginx-server-cm
+  files:
+    - server=configMaps/nginx.conf
+- name: front-nginx-page-cm
+  files:
+    - page=configMaps/index.html
+
+secretGenerator:
+- name: user-password-secret
+  files:
+    - password=secrets/userPassword.txt
+
+patches:
+- target:
+    kind: Deployment
+    name: frontend-deployment
+  patch: |-
+    - op: add
+      path: /spec/template/spec/containers/0/volumeMounts
+      value:
+        - name: front-nginx-page-volume
+          mountPath: /usr/share/nginx/html
+    - op: add
+      path: /spec/template/volumes
+      value:
+        - name: front-nginx-page-volume
+          configMap: 
+            name: front-nginx-page-cm
+            items:
+              - key: page
+                path: index.html
+#- name: front-ssl-secret
+#  files:
+#    - tls.crt=../../secrets/ssl/nginx-selfsigned.crt
+#    - tls.key=../../secrets/ssl/nginx-selfsigned.key
+#  type: "kubernetes.io/tls"
